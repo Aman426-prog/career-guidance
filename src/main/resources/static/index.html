@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Career Guidance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E9EFF1; --panel:#F8FBFB; --ink:#10222B; --muted:#52656D; --line:#C3D0D5;
+  --needle:#E3A008; --good:#17705F; --bad:#A12B2B; --chip-on:#10222B; --chip-on-text:#F8FBFB;
+  --display:"Bricolage Grotesque",system-ui,sans-serif; --body:"Instrument Sans",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0E1B21; --panel:#152830; --ink:#E6EEF0; --muted:#94A9B1; --line:#2A424B;
+    --needle:#F2B705; --good:#4FC3A8; --bad:#F08A8A; --chip-on:#E6EEF0; --chip-on-text:#0E1B21; color-scheme:dark;
+  }
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--body);-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.15}
+button,select,input{font:inherit;color:inherit}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--needle);outline-offset:2px}
+
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:8px 0 20px}
+.top h1{font-size:clamp(28px,5vw,40px);font-weight:700;letter-spacing:-.01em}
+.top p{margin:6px 0 0;color:var(--muted);max-width:46ch}
+.who{display:flex;align-items:center;gap:10px;color:var(--muted);white-space:nowrap}
+.linkbtn{background:none;border:1px solid var(--line);border-radius:8px;min-height:40px;padding:6px 14px;cursor:pointer}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+.card h2{font-size:20px;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:20px;align-items:start}
+.left,.right{display:flex;flex-direction:column;gap:20px}
+
+/* auth */
+.auth{max-width:400px;margin:24px auto}
+.auth form{display:flex;flex-direction:column;gap:12px}
+.auth label{font-weight:600;display:block;margin-bottom:4px}
+input[type=text],input[type=email],input[type=password],select{width:100%;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.primary{min-height:44px;border:0;border-radius:8px;background:var(--ink);color:var(--bg);font-weight:600;cursor:pointer;padding:8px 16px}
+.primary:disabled{opacity:.6;cursor:wait}
+.switch{margin-top:12px;text-align:center}
+.switch button{background:none;border:0;text-decoration:underline;cursor:pointer;color:var(--muted);min-height:40px}
+.msg{min-height:1.4em;font-size:14px}
+.msg.err{color:var(--bad)} .msg.ok{color:var(--good)}
+
+/* resume */
+.upload{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.upload input[type=file]{flex:1;min-width:180px;max-width:100%}
+.upload .primary{flex:none}
+
+/* skills */
+.legend{font-size:14px;color:var(--muted);margin:2px 0 14px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--needle);margin-right:6px}
+.group{margin-bottom:14px}
+.group h3{font-size:15px;color:var(--muted);font-weight:500;margin-bottom:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:40px;padding:6px 14px;border:1px solid var(--line);border-radius:999px;background:var(--bg);cursor:pointer;display:inline-flex;align-items:center}
+.chip.rel::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--needle);margin-right:8px}
+.chip[aria-pressed="true"]{background:var(--chip-on);color:var(--chip-on-text);border-color:var(--chip-on)}
+
+/* dial */
+.dial-card{border-radius:28px;padding:20px 20px 22px;text-align:center}
+.dial{width:min(100%,320px);margin:0 auto;display:block}
+.dial .track{stroke:var(--line)}
+.dial .prog{stroke:var(--good);transition:stroke-dasharray .7s cubic-bezier(.3,.8,.3,1)}
+.dial .tick{stroke:var(--muted)}
+.dial text{fill:var(--muted);font:500 11px var(--body)}
+.needle{transform-origin:120px 120px;transition:transform .7s cubic-bezier(.3,1.3,.5,1)}
+.dial .hub{fill:var(--ink)}
+.score{font:700 44px/1 var(--display);margin-top:-6px}
+.status{font-weight:600;margin-top:6px}
+.sub{color:var(--muted);font-size:14px;margin-top:2px}
+
+/* tabs and lists */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:-4px 0 16px;overflow-x:auto}
+.tab{min-height:44px;padding:8px 14px;background:none;border:0;border-bottom:3px solid transparent;cursor:pointer;color:var(--muted);font-weight:600;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--needle)}
+.panel h3{font-size:16px;margin:16px 0 8px}
+.panel h3:first-child{margin-top:0}
+.item{padding:10px 0;border-top:1px solid var(--line)}
+.item:first-of-type{border-top:0}
+.note{display:block;color:var(--muted);font-size:14px}
+.tag{display:inline-block;font-size:12px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;margin-left:8px;color:var(--muted);vertical-align:middle}
+.empty{color:var(--muted);margin:0}
+.covered{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.covered span{font-size:13px;padding:2px 10px;border-radius:999px;background:var(--bg);border:1px solid var(--line)}
+ol.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+ol.steps li{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line);counter-increment:s}
+ol.steps li:first-child{border-top:0}
+ol.steps li::before{content:counter(s);flex:none;width:28px;height:28px;border-radius:50%;background:var(--bg);border:1px solid var(--line);display:grid;place-items:center;font:600 13px var(--body);margin-top:2px}
+.step-main{flex:1}
+.done-btn{flex:none;min-height:40px;padding:6px 12px;border:1px solid var(--good);color:var(--good);background:none;border-radius:8px;cursor:pointer;font-weight:600}
+.foot{font-size:13px;color:var(--muted);margin-top:14px}
+
+.minibar{display:none}
+@media (max-width:860px){
+  .grid{grid-template-columns:minmax(0,1fr)}
+  .minibar{display:flex;position:sticky;top:0;z-index:5;justify-content:space-between;align-items:center;
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 14px;margin-bottom:14px;font-weight:600}
+  .minibar b{font:700 20px var(--display)}
+  .who span{display:none}
+}
+@media (prefers-reduced-motion: reduce){ .needle,.dial .prog{transition:none} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>Career Guidance</h1>
+      <p>Pick a target role, add your skills (or scan your resume), and see how close you are to job ready.</p>
+    </div>
+    <div class="who" id="who" hidden><span id="whoName"></span><button class="linkbtn" id="logout">Log out</button></div>
+  </div>
+
+  <!-- Log in / register -->
+  <section class="card auth" id="authView">
+    <h2 id="authTitle">Log in</h2>
+    <form id="authForm" novalidate>
+      <div id="nameRow" hidden><label for="name">Name</label><input id="name" type="text" autocomplete="name"></div>
+      <div><label for="email">Email</label><input id="email" type="email" autocomplete="email" required></div>
+      <div><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required></div>
+      <div class="msg err" id="authMsg" role="alert"></div>
+      <button class="primary" id="authSubmit" type="submit">Log in</button>
+    </form>
+    <div class="switch"><button id="authSwitch" type="button">Create an account</button></div>
+  </section>
+
+  <!-- App -->
+  <div id="appView" hidden>
+    <div class="minibar" aria-hidden="true"><span id="miniStatus">Readiness</span><b id="miniScore">0</b></div>
+    <div class="grid">
+      <div class="left">
+        <section class="card">
+          <label for="role" style="font-weight:600;display:block;margin-bottom:6px">Target role</label>
+          <select id="role"></select>
+        </section>
+
+        <section class="card">
+          <h2>Scan your resume</h2>
+          <div class="upload">
+            <input type="file" id="resumeFile" accept="application/pdf,.pdf" aria-label="Resume PDF">
+            <button class="primary" id="resumeBtn" type="button">Scan resume</button>
+          </div>
+          <div class="msg" id="resumeMsg" role="status"></div>
+        </section>
+
+        <section class="card">
+          <h2>Your skills</h2>
+          <p class="legend"><span class="dot"></span>Needed for the selected role</p>
+          <div id="skills"></div>
+        </section>
+      </div>
+
+      <div class="right">
+        <section class="card dial-card" aria-live="polite">
+          <svg class="dial" viewBox="0 0 240 240" role="img" aria-label="Readiness gauge">
+            <path class="track" d="M 52.1 187.9 A 96 96 0 1 1 187.9 187.9" fill="none" stroke-width="10" stroke-linecap="round" pathLength="100"/>
+            <path id="prog" class="prog" d="M 52.1 187.9 A 96 96 0 1 1 187.9 187.9" fill="none" stroke-width="10" stroke-linecap="round" pathLength="100" stroke-dasharray="0 100"/>
+            <g id="ticks"></g>
+            <g id="needle" class="needle">
+              <polygon points="120,40 126.5,120 113.5,120" fill="var(--needle)"/>
+              <polygon points="113.5,120 126.5,120 120,146" fill="var(--ink)"/>
+            </g>
+            <circle class="hub" cx="120" cy="120" r="8"/>
+          </svg>
+          <div class="score" id="score">0</div>
+          <div class="status" id="status"></div>
+          <div class="sub" id="sub"></div>
+        </section>
+
+        <section class="card">
+          <div class="tabs" role="tablist">
+            <button class="tab" role="tab" id="t-gaps" aria-selected="true" aria-controls="p-gaps">Skill gaps</button>
+            <button class="tab" role="tab" id="t-road" aria-selected="false" aria-controls="p-road">Roadmap</button>
+            <button class="tab" role="tab" id="t-more" aria-selected="false" aria-controls="p-more">Certs and projects</button>
+          </div>
+          <div class="panel" id="p-gaps" role="tabpanel" aria-labelledby="t-gaps"></div>
+          <div class="panel" id="p-road" role="tabpanel" aria-labelledby="t-road" hidden></div>
+          <div class="panel" id="p-more" role="tabpanel" aria-labelledby="t-more" hidden></div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const PLABEL = {HIGH:"High priority", MEDIUM:"Medium priority", BONUS:"Bonus"};
+
+let token = localStorage.getItem("cg_token");
+let state = {roles:[], skills:[], mine:new Set(), profile:null, analysis:null, certs:[], projects:[]};
+
+/* ---------- API helper ---------- */
+async function api(path, opts = {}) {
+  const headers = {...(opts.headers || {})};
+  if (token) headers.Authorization = "Bearer " + token;
+  let body = opts.body;
+  if (opts.json !== undefined) { headers["Content-Type"] = "application/json"; body = JSON.stringify(opts.json); }
+  const res = await fetch(path, {method: opts.method || "GET", headers, body});
+  if (res.status === 401 && !path.startsWith("/api/auth")) { logout(); throw new Error("Session expired. Log in again."); }
+  const data = res.status === 204 ? null : await res.json().catch(() => null);
+  if (!res.ok) throw new Error((data && data.error) || "Request failed (" + res.status + ")");
+  return data;
+}
+
+/* ---------- auth ---------- */
+let registering = false;
+function setMode(reg) {
+  registering = reg;
+  $("authTitle").textContent = reg ? "Create an account" : "Log in";
+  $("authSubmit").textContent = reg ? "Create account" : "Log in";
+  $("authSwitch").textContent = reg ? "I already have an account" : "Create an account";
+  $("nameRow").hidden = !reg;
+  $("password").autocomplete = reg ? "new-password" : "current-password";
+  $("authMsg").textContent = "";
+}
+$("authSwitch").addEventListener("click", () => setMode(!registering));
+$("authForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  $("authMsg").textContent = "";
+  $("authSubmit").disabled = true;
+  try {
+    const payload = registering
+      ? {name: $("name").value, email: $("email").value, password: $("password").value}
+      : {email: $("email").value, password: $("password").value};
+    const res = await api(registering ? "/api/auth/register" : "/api/auth/login", {method:"POST", json:payload});
+    token = res.token;
+    localStorage.setItem("cg_token", token);
+    $("password").value = "";
+    await start();
+  } catch (err) { $("authMsg").textContent = err.message; }
+  finally { $("authSubmit").disabled = false; }
+});
+function logout() {
+  token = null; localStorage.removeItem("cg_token");
+  $("appView").hidden = true; $("who").hidden = true; $("authView").hidden = false;
+}
+$("logout").addEventListener("click", logout);
+
+/* ---------- loading ---------- */
+async function start() {
+  try {
+    const [roles, skills, profile, mine] = await Promise.all([
+      api("/api/roles"), api("/api/skills"), api("/api/users/me"), api("/api/skills/me")]);
+    state.roles = roles; state.skills = skills; state.profile = profile;
+    state.mine = new Set(mine.map(s => s.id));
+    $("authView").hidden = true; $("appView").hidden = false; $("who").hidden = false;
+    $("whoName").textContent = profile.name;
+    renderRoleSelect();
+    await refreshResults();
+  } catch (err) { if (token) alert(err.message); }
+}
+
+async function refreshResults() {
+  if (state.profile.targetRole) {
+    const [analysis, certs, projects] = await Promise.all([
+      api("/api/analysis"), api("/api/certifications/recommendations"), api("/api/projects/recommendations")]);
+    state.analysis = analysis; state.certs = certs; state.projects = projects;
+  } else {
+    state.analysis = null; state.certs = []; state.projects = [];
+  }
+  render();
+}
+
+/* ---------- actions ---------- */
+$("role").addEventListener("change", async () => {
+  if (!$("role").value) return;
+  state.profile = await api("/api/users/me/role", {method:"PUT", json:{roleId: Number($("role").value)}});
+  renderRoleSelect();
+  await refreshResults();
+});
+
+async function setSkill(id, on) {
+  const list = on ? await api("/api/skills/me", {method:"POST", json:{skillId:id}})
+                  : await api("/api/skills/me/" + id, {method:"DELETE"});
+  state.mine = new Set(list.map(s => s.id));
+  await refreshResults();
+}
+$("skills").addEventListener("click", e => {
+  const b = e.target.closest("[data-id]");
+  if (b) { const id = Number(b.dataset.id); setSkill(id, !state.mine.has(id)).catch(err => alert(err.message)); }
+});
+$("p-road").addEventListener("click", e => {
+  const b = e.target.closest("[data-skill]");
+  if (!b) return;
+  const s = state.skills.find(x => x.name === b.dataset.skill);
+  if (s) setSkill(s.id, true).catch(err => alert(err.message));
+});
+
+$("resumeBtn").addEventListener("click", async () => {
+  const file = $("resumeFile").files[0], msg = $("resumeMsg");
+  msg.className = "msg";
+  if (!file) { msg.classList.add("err"); msg.textContent = "Choose a PDF resume first."; return; }
+  const fd = new FormData(); fd.append("file", file);
+  $("resumeBtn").disabled = true; msg.textContent = "Scanning...";
+  try {
+    const r = await api("/api/resume", {method:"POST", body: fd});
+    msg.classList.add("ok");
+    msg.textContent = r.found.length
+      ? `Found ${r.found.length} skills, added ${r.added.length} new: ${r.found.join(", ")}.`
+      : "No known skills found in that resume.";
+    const mine = await api("/api/skills/me");
+    state.mine = new Set(mine.map(s => s.id));
+    await refreshResults();
+  } catch (err) { msg.classList.add("err"); msg.textContent = err.message; }
+  finally { $("resumeBtn").disabled = false; }
+});
+
+/* ---------- rendering ---------- */
+function renderRoleSelect() {
+  const cur = state.profile.targetRole ? state.profile.targetRole.id : "";
+  $("role").innerHTML = (cur ? "" : `<option value="">Choose a role</option>`) +
+    state.roles.map(r => `<option value="${r.id}">${esc(r.name)}</option>`).join("");
+  $("role").value = cur;
+}
+
+function renderSkills() {
+  const rel = state.analysis ? new Set([...state.analysis.covered, ...state.analysis.missing.map(m => m.skill)]) : new Set();
+  const groups = {};
+  state.skills.forEach(s => (groups[s.category] = groups[s.category] || []).push(s));
+  $("skills").innerHTML = Object.entries(groups).map(([cat, list]) =>
+    `<div class="group"><h3>${esc(cat)}</h3><div class="chips">` +
+    list.map(s => `<button class="chip${rel.has(s.name) ? " rel" : ""}" data-id="${s.id}" aria-pressed="${state.mine.has(s.id)}">${esc(s.name)}</button>`).join("") +
+    `</div></div>`).join("");
+}
+
+function renderDial() {
+  const a = state.analysis, score = a ? a.score : 0;
+  $("needle").style.transform = `rotate(${-135 + score * 2.7}deg)`;
+  $("prog").setAttribute("stroke-dasharray", `${score} 100`);
+  $("score").textContent = a ? score : "–";
+  $("status").textContent = a ? a.status : "Choose a target role";
+  const total = a ? a.covered.length + a.missing.length : 0;
+  const hi = a ? a.missing.filter(m => m.priority === "HIGH").length : 0;
+  $("sub").textContent = a ? `${a.covered.length} of ${total} skills covered` + (hi ? ` · ${hi} high-priority missing` : "") : "";
+  $("miniScore").textContent = a ? score : "–";
+  $("miniStatus").textContent = a ? a.status : "Choose a target role";
+}
+
+function renderGaps() {
+  const a = state.analysis;
+  if (!a) { $("p-gaps").innerHTML = `<p class="empty">Pick a target role to see your skill gaps.</p>`; return; }
+  let html = "";
+  ["HIGH","MEDIUM","BONUS"].forEach(p => {
+    const items = a.missing.filter(m => m.priority === p);
+    if (items.length) html += `<h3>${PLABEL[p]}</h3>` + items.map(m => `<div class="item"><b>${esc(m.skill)}</b><span class="note">${esc(m.blurb)}</span></div>`).join("");
+  });
+  if (!a.missing.length) html = `<p class="empty">No gaps for ${esc(a.role)}. Try another role or build one of the projects.</p>`;
+  if (a.covered.length) html += `<h3>Already covered</h3><div class="covered">${a.covered.map(s => `<span>${esc(s)}</span>`).join("")}</div>`;
+  $("p-gaps").innerHTML = html;
+}
+
+function renderRoadmap() {
+  const a = state.analysis;
+  if (!a) { $("p-road").innerHTML = `<p class="empty">Pick a target role to get a roadmap.</p>`; return; }
+  if (!a.missing.length) { $("p-road").innerHTML = `<p class="empty">Roadmap complete. Every skill for ${esc(a.role)} is covered.</p>`; return; }
+  $("p-road").innerHTML =
+    `<p class="empty" style="margin-bottom:8px">${a.missing.length} step${a.missing.length > 1 ? "s" : ""} left, highest priority first. Mark a step done and your score updates.</p>` +
+    `<ol class="steps">` + a.missing.map(m =>
+      `<li><div class="step-main"><b>${esc(m.skill)}</b><span class="tag">${PLABEL[m.priority]}</span><span class="note">${esc(m.blurb)}</span></div>` +
+      `<button class="done-btn" data-skill="${esc(m.skill)}" aria-label="Mark ${esc(m.skill)} as learned">Done</button></li>`).join("") + `</ol>`;
+}
+
+function renderMore() {
+  if (!state.analysis) { $("p-more").innerHTML = `<p class="empty">Pick a target role to see recommendations.</p>`; return; }
+  let html = `<h3>Certifications for your gaps</h3>` + (state.certs.length
+    ? state.certs.map(c => `<div class="item"><b>${esc(c.certification)}</b><span class="note">Covers ${esc(c.skill)}</span></div>`).join("")
+    : `<p class="empty">No certifications mapped to your current gaps.</p>`);
+  html += `<h3>Portfolio projects for ${esc(state.analysis.role)}</h3>` +
+    state.projects.map(p => `<div class="item"><b>${esc(p.title)}</b><span class="note">${esc(p.description)}</span></div>`).join("");
+  html += `<p class="foot">Check each provider's site for current exam names and availability.</p>`;
+  $("p-more").innerHTML = html;
+}
+
+function render() { renderSkills(); renderDial(); renderGaps(); renderRoadmap(); renderMore(); }
+
+/* ---------- tabs and gauge ticks ---------- */
+const tabs = [["t-gaps","p-gaps"],["t-road","p-road"],["t-more","p-more"]];
+tabs.forEach(([t, p]) => $(t).addEventListener("click", () => {
+  tabs.forEach(([t2, p2]) => { $(t2).setAttribute("aria-selected", t2 === t); $(p2).hidden = (p2 !== p); });
+}));
+
+(function ticks() {
+  let out = "";
+  for (let i = 0; i <= 20; i++) {
+    const a = (-135 + i * 13.5) * Math.PI / 180, major = i % 5 === 0, r1 = 80, r2 = major ? 68 : 73;
+    out += `<line class="tick" stroke-width="${major ? 2 : 1}" x1="${(120 + r1 * Math.sin(a)).toFixed(1)}" y1="${(120 - r1 * Math.cos(a)).toFixed(1)}" x2="${(120 + r2 * Math.sin(a)).toFixed(1)}" y2="${(120 - r2 * Math.cos(a)).toFixed(1)}"/>`;
+  }
+  out += `<text x="68" y="214" text-anchor="middle">0</text><text x="172" y="214" text-anchor="middle">100</text>`;
+  $("ticks").innerHTML = out;
+})();
+
+if (token) start();
+</script>
+</body>
+</html>
